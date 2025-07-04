@@ -4,7 +4,34 @@
 // @grant        none
 // ==/UserScript==
 
+
+
+
 (async function() {
+
+const scriptSrc = chrome.runtime.getURL('opencv/opencv.js');
+const scriptTop = document.createElement('script');
+scriptTop.src = scriptSrc;
+
+// Wait for OpenCV.js to load and initialize before proceeding
+await new Promise((resolve, reject) => {
+  scriptTop.onload = () => {
+    cv['onRuntimeInitialized'] = resolve;
+  };
+  scriptTop.onerror = reject;
+});
+
+document.head.appendChild(scriptTop);
+
+// Check if OpenCV.js is loaded and log a message
+if (cv) {
+  console.log('OpenCV.js is successfully loaded and initialized.');
+} else {
+  console.error('Failed to load OpenCV.js.');
+}
+
+
+
   // -- Setup injected CSS
   const style = document.createElement('style');
   style.textContent = `
@@ -90,22 +117,38 @@
     });
   }
 
-  // face detection via face-api.js
-  let faceApiLoaded = false;
+  // face detection via OpenCV.js Haar Cascade
+  let haarCascadeLoaded = false;
   async function hasFace(img) {
+    debugger
     if (!img.complete || img.naturalWidth === 0) {
       await new Promise((r, e) => {
         img.addEventListener('load', r, { once: true });
         img.addEventListener('error', e, { once: true });
       });
     }
-    if (!faceApiLoaded) {
-      const modelPath = chrome.runtime.getURL('face-api/weights');
-      await faceapi.nets.tinyFaceDetector.loadFromUri(modelPath);
-      faceApiLoaded = true;
+    if (!haarCascadeLoaded) {
+      const xmlPath = chrome.runtime.getURL('opencv/haarcascade_frontalface_default.xml');
+      const response = await fetch(xmlPath);
+      const xmlText = await response.text();
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+      cv.FS_createDataFile('/', 'haarcascade_frontalface_default.xml', new TextEncoder().encode(xmlText), true, false, false);
+      haarCascadeLoaded = true;
     }
-    const opts = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 });
-    return (await faceapi.detectSingleFace(img, opts)) != null;
+    const src = cv.imread(img);
+    const gray = new cv.Mat();
+    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
+    const faces = new cv.RectVector();
+    const classifier = new cv.CascadeClassifier();
+    classifier.load('haarcascade_frontalface_default.xml');
+    classifier.detectMultiScale(gray, faces, 1.1, 3, 0);
+    const hasFace = faces.size() > 0;
+    src.delete();
+    gray.delete();
+    faces.delete();
+    classifier.delete();
+    return hasFace;
   }
 
   // process when visible

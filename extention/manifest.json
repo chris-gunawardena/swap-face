@@ -28,13 +28,14 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["face-api/face-api.min.js", "content-script.js"]
+      "js": ["content-script.js"]
     }
   ],
   "web_accessible_resources": [{
     "resources": [
-      "face-api/weights/*",
-      "assets/swap-icon.svg"
+      "opencv/haarcascade_frontalface_default.xml",
+      "assets/swap-icon.svg",
+      "opencv/opencv.js"
     ],
     "matches": ["<all_urls>"]
   }],

@@ -4,10 +4,10 @@
   "description": "Chrome extension for face swapping",
   "main": "popup.js",
   "scripts": {
-    "copy-files": "mkdir -p ./extention/face-api ./extention/firebase && cp ./node_modules/face-api.js/dist/face-api.min.js ./extention/face-api/ && cp ./node_modules/firebase/firebase-app.js ./extention/firebase/firebase-app.js && cp ./node_modules/firebase/firebase-auth.js ./extention/firebase/firebase-auth.js && cp ./node_modules/firebase/firebase-storage.js ./extention/firebase/firebase-storage.js"
+    "copy-files": "mkdir -p ./extention/firebase ./extention/opencv && cp ./node_modules/firebase/firebase-app.js ./extention/firebase/firebase-app.js && cp ./node_modules/firebase/firebase-auth.js ./extention/firebase/firebase-auth.js && cp ./node_modules/firebase/firebase-storage.js ./extention/firebase/firebase-storage.js && cp ./node_modules/opencv.js/opencv.js ./extention/opencv/opencv.js && (test -f ./node_modules/opencv.js/haarcascade_frontalface_default.xml || curl -o ./extention/opencv/haarcascade_frontalface_default.xml https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_default.xml)"
   },
   "dependencies": {
-    "face-api.js": "^0.22.2",
-    "firebase": "^9.18.0"
+    "firebase": "^9.18.0",
+    "opencv.js": "^1.0.0"
   }
 }
