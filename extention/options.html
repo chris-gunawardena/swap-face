@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>FaceSwap Settings</title></head>
+<body>
+  <h1>Settings</h1>
+  <div id="settings-container" style="display:none;">
+    <p>Logged in as <strong id="settings-email"></strong></p>
+    <img id="face-photo" src="" alt="Your face" style="max-width:200px;border:1px solid #ccc;"/><br/>
+    <button id="change-photo-btn">Change Photo</button>
+    <button id="logout-settings-btn">Logout</button>
+    <div id="change-container" style="display:none; margin-top:1em;">
+      <input id="opt-file-input" type="file" accept="image/*"/><br/>
+      <button id="opt-capture-btn">Capture from Camera</button><br/>
+      <video id="opt-video" autoplay style="display:none;width:200px;"></video>
+      <canvas id="opt-canvas" style="display:none;"></canvas><br/>
+      <button id="opt-save-btn" style="display:none;">Save Photo</button>
+    </div>
+  </div>
+  <div id="login-prompt" style="display:none;">
+    <p>Please login via the popup to change settings.</p>
+  </div>
+  <script type="module" src="options.js"></script>
+</body>
+</html>

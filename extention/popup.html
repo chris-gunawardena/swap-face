@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>FaceSwap Login</title></head>
+<body>
+  <div id="auth-container">
+    <h2>Login / Sign Up</h2>
+    <input id="email" type="email" placeholder="Email"/><br/>
+    <input id="password" type="password" placeholder="Password"/><br/>
+    <button id="login-btn">Login</button>
+    <button id="signup-btn">Sign Up</button>
+  </div>
+
+  <div id="app-container" style="display:none;">
+    <h2>Welcome, <span id="user-email"></span></h2>
+    <p>Upload or capture your face photo:</p>
+    <input id="file-input" type="file" accept="image/*"/><br/>
+    <button id="capture-btn">Capture from Camera</button><br/>
+    <video id="video-stream" autoplay style="display:none;width:200px;"></video>
+    <canvas id="capture-canvas" style="display:none;"></canvas><br/>
+    <button id="save-photo-btn" style="display:none;">Save Photo</button>
+    <hr/>
+    <button id="settings-link">Settings</button>
+    <button id="logout-btn">Logout</button>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

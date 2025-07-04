@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "FaceSwap Extension",
+  "version": "1.0",
+  "description": "Swap faces on e-commerce sites",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_popup": "popup.html"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["face-api/face-api.min.js", "content-script.js"]
+    }
+  ],
+  "web_accessible_resources": [{
+    "resources": [
+      "face-api/weights/*",
+      "assets/swap-icon.svg"
+    ],
+    "matches": ["<all_urls>"]
+  }],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "face-swap-extension",
+  "version": "1.0.0",
+  "description": "Chrome extension for face swapping",
+  "main": "popup.js",
+  "scripts": {
+    "copy-files": "mkdir -p ./extention/face-api ./extention/firebase && cp ./node_modules/face-api.js/dist/face-api.min.js ./extention/face-api/ && cp ./node_modules/firebase/firebase-app.js ./extention/firebase/firebase-app.js && cp ./node_modules/firebase/firebase-auth.js ./extention/firebase/firebase-auth.js && cp ./node_modules/firebase/firebase-storage.js ./extention/firebase/firebase-storage.js"
+  },
+  "dependencies": {
+    "face-api.js": "^0.22.2",
+    "firebase": "^9.18.0"
+  }
+}

@@ -1,0 +1,49 @@
+# Ignore node_modules directories
+node_modules/
+
+# Ignore Python bytecode and virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore C extensions
+*.so
+
+# Ignore distribution/packaging files
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Ignore installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Ignore unit test/coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+*.cover
+*.py,cover
+.hypothesis/
+
+# Ignore PyCharm project files
+.idea/
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore logs
+*.log
+
+# Ignore Firebase debug logs
+firebase-debug.log
+firebase-debug.*.log
+
+# Ignore other temporary files
+*.swp
+*.swo
+*.swn
