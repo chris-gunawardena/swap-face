@@ -8,27 +8,23 @@
 
 
 (async function() {
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
 
-const scriptSrc = chrome.runtime.getURL('opencv/opencv.js');
-const scriptTop = document.createElement('script');
-scriptTop.src = scriptSrc;
+  const scriptSrc = chrome.runtime.getURL('opencv/opencv.js');
+  const scriptTop = iframe.contentDocument.createElement('script');
+  scriptTop.src = scriptSrc;
 
-// Wait for OpenCV.js to load and initialize before proceeding
-await new Promise((resolve, reject) => {
   scriptTop.onload = () => {
-    cv['onRuntimeInitialized'] = resolve;
+    console.log('OpenCV.js is successfully loaded and initialized in an isolated context.');
   };
-  scriptTop.onerror = reject;
-});
 
-document.head.appendChild(scriptTop);
+  scriptTop.onerror = () => {
+    console.error('Failed to load OpenCV.js in the isolated context.');
+  };
 
-// Check if OpenCV.js is loaded and log a message
-if (cv) {
-  console.log('OpenCV.js is successfully loaded and initialized.');
-} else {
-  console.error('Failed to load OpenCV.js.');
-}
+  iframe.contentDocument.head.appendChild(scriptTop);
 
 
 
@@ -120,7 +116,6 @@ if (cv) {
   // face detection via OpenCV.js Haar Cascade
   let haarCascadeLoaded = false;
   async function hasFace(img) {
-    debugger
     if (!img.complete || img.naturalWidth === 0) {
       await new Promise((r, e) => {
         img.addEventListener('load', r, { once: true });
