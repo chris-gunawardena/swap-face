@@ -33,6 +33,7 @@
   ],
   "web_accessible_resources": [{
     "resources": [
+      "bootstrap.js",
       "opencv/haarcascade_frontalface_default.xml",
       "assets/swap-icon.svg",
       "opencv/opencv.js"
