@@ -1,34 +1,37 @@
 // bootstrap.js
 ;(function(){
-  // 1) Grab our own extension base URL
   const me = document.currentScript;
-  if (!me) return console.error('bootstrap.js: no currentScript');
-  const baseURL = me.src.replace(/bootstrap\.js$/, '');
+  if (!me) {
+    console.error('bootstrap.js: no currentScript!');
+    return;
+  }
+  // The URL that points at your extension’s opencv/ folder:
+  const base = me.src.replace(/bootstrap\.js$/, '');
 
-  // 2) Emscripten hook: when single-file (base64) build finishes, fire an event
+  // 1) Let Emscripten fire an event when it’s actually up
   window.Module = {
     onRuntimeInitialized() {
-      window.dispatchEvent(new Event('opencv‐loaded'));
+      window.dispatchEvent(new Event('opencv-loaded'));
     }
   };
 
-  // 3) Temporarily disable AMD/RequireJS so opencv.js attaches to window.cv
-  const _define = window.define, _require = window.require;
-  if (_define && _define.amd) {
+  // 2) Temporarily disable AMD so OpenCV.js will do `root.cv = factory()`
+  const _d = window.define, _r = window.require;
+  if (_d && _d.amd) {
     window.define  = undefined;
     window.require = undefined;
   }
 
-  // 4) Inject the single-file opencv.js (which already includes Wasm)
+  // 3) Inject the single-file opencv.js
   const s = document.createElement('script');
-  s.src = baseURL + 'opencv/opencv.js';
+  s.src = base + 'opencv/opencv.js';  // now your bundled file
   s.onload = () => {
-    // restore AMD immediately
-    if (_define && _define.amd) {
-      window.define  = _define;
-      window.require = _require;
+    // restore AMD right away
+    if (_d && _d.amd) {
+      window.define  = _d;
+      window.require = _r;
     }
-    console.log('bootstrap.js → opencv.js loaded, waiting for onRuntimeInitialized');
+    console.log('bootstrap.js → opencv.js loaded; awaiting runtime init');
   };
   s.onerror = () => console.error('bootstrap.js → failed to load opencv.js');
   document.head.appendChild(s);
