@@ -32,7 +32,9 @@
     "resources": [
       "opencv/haarcascade_frontalface_default.xml",
       "assets/swap-icon.svg",
-      "opencv/opencv.full.js"
+      "opencv/opencv.full.js",
+      "models/simswap_quant.onnx",
+      "ort/ort.min.js"
     ],
     "matches": ["<all_urls>"]
   }],
