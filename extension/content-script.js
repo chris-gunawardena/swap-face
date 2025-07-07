@@ -3,10 +3,12 @@
   // ─────────────────────────────────────────────
   // 1) Grab OpenCV.js and Haar cascade for face detection
   // ─────────────────────────────────────────────
-  const [opencvText, cascadeBuf] = await Promise.all([
+  const [opencvText, cascadeBuf, ortText] = await Promise.all([
     fetch(chrome.runtime.getURL('opencv/opencv.full.js')).then(r => r.text()),
     fetch(chrome.runtime.getURL('opencv/haarcascade_frontalface_default.xml'))
-      .then(r => r.arrayBuffer())
+      .then(r => r.arrayBuffer()),
+    fetch(chrome.runtime.getURL('ort/ort.min.js')).then(r => r.text())
+
   ]);
   const cascadeBytes = Array.from(new Uint8Array(cascadeBuf));
 
@@ -16,36 +18,36 @@
   const detectWorkerSrc = `
     ${opencvText}
 
-    cv.onRuntimeInitialized = () => {
+    (async () => {
       // write Haar file into Wasm FS
       const data = new Uint8Array(${JSON.stringify(cascadeBytes)});
       cv.FS_createDataFile('/', 'haarcascade_frontalface_default.xml',
                           data, true, false, false);
       postMessage({ type: 'ready' });
+    })();
 
-      onmessage = ({ data }) => {
-        if (data.type !== 'detect') return;
-        const { width, height, pixels, requestId } = data;
-        const imgData = new ImageData(new Uint8ClampedArray(pixels), width, height);
+    onmessage = ({ data }) => {
+      if (data.type !== 'detect') return;
+      const { width, height, pixels, requestId } = data;
+      const imgData = new ImageData(new Uint8ClampedArray(pixels), width, height);
 
-        // run detection
-        const src  = cv.matFromImageData(imgData);
-        const gray = new cv.Mat();
-        cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-        const facesVec = new cv.RectVector();
-        const clf = new cv.CascadeClassifier();
-        clf.load('haarcascade_frontalface_default.xml');
-        clf.detectMultiScale(gray, facesVec, 1.1, 3, 0);
+      // run detection
+      const src  = cv.matFromImageData(imgData);
+      const gray = new cv.Mat();
+      cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+      const facesVec = new cv.RectVector();
+      const clf = new cv.CascadeClassifier();
+      clf.load('haarcascade_frontalface_default.xml');
+      clf.detectMultiScale(gray, facesVec, 1.1, 3, 0);
 
-        const faces = [];
-        for (let i = 0; i < facesVec.size(); i++) {
-          const r = facesVec.get(i);
-          faces.push({ x: r.x, y: r.y, w: r.width, h: r.height });
-        }
+      const faces = [];
+      for (let i = 0; i < facesVec.size(); i++) {
+        const r = facesVec.get(i);
+        faces.push({ x: r.x, y: r.y, w: r.width, h: r.height });
+      }
 
-        src.delete(); gray.delete(); facesVec.delete(); clf.delete();
-        postMessage({ type: 'done', requestId, faces });
-      };
+      src.delete(); gray.delete(); facesVec.delete(); clf.delete();
+      postMessage({ type: 'done', requestId, faces });
     };
   `;
   const detectWorker = new Worker(
@@ -56,17 +58,19 @@
   // 3) Build & spawn the swap worker (on-device ONNX)
   // ─────────────────────────────────────────────
   const swapWorkerSrc = `
+    ${ortText}
     // load the UMD build of onnxruntime-web
-    importScripts("${chrome.runtime.getURL('ort/ort.min.js')}");
 
     let session;
     (async () => {
       session = await ort.InferenceSession.create(
-        chrome.runtime.getURL('models/simswap_quant.onnx'),
+        ${JSON.stringify(chrome.runtime.getURL('models/simswap_quant.onnx'))},
         { executionProviders: ['webgl'] }
       );
       postMessage({ type: 'swap-ready' });
-    })().catch(err => postMessage({ type: 'swap-error', error: err.message }));
+    })().catch(err => {
+        postMessage({ type: 'swap-error', error: err.message });
+      });
 
     onmessage = async ({ data }) => {
       if (data.type !== 'swap') return;

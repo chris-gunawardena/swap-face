@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "firebase": "^9.18.0",
+    "onnxruntime-web": "^1.22.0",
     "opencv.js": "^1.0.0"
   }
 }
