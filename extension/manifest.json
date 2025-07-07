@@ -34,6 +34,7 @@
       "assets/swap-icon.svg",
       "opencv/opencv.full.js",
       "models/simswap_quant.onnx",
+      "ort/ort-wasm-simd-threaded.wasm",
       "ort/ort.min.js"
     ],
     "matches": ["<all_urls>"]
